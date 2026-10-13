@@ -84,7 +84,9 @@ export const changeDescription: INodeProperties[] = [
 	{
 		displayName:
 			'The exact internal_name of a field (e.g. "title" or "c_123") can be found via Structure -> Get Template ' +
-			'Meta, in that template\'s attributes list.',
+			"Meta, in that template's attributes list. Use the internal_name as-is, with no added prefix - default " +
+			"properties are unprefixed (e.g. \"title\", \"company\") and custom attributes already include their own " +
+			'"c_" prefix (e.g. "c_123").',
 		name: 'updateNotice',
 		type: 'notice',
 		default: '',
@@ -109,11 +111,11 @@ export const changeDescription: INodeProperties[] = [
 						name: 'fieldName',
 						type: 'string',
 						default: '',
-						placeholder: '_title or c_myCustomField',
+						placeholder: 'title or c_myCustomField',
 						description:
-							"Prefix a default property with '_' (e.g. _title) or a custom attribute with 'c_' (e.g. " +
-							"c_myCustomField). Custom attribute internal_name values already include the 'c_' prefix - see " +
-							'Structure -> Get Template Meta for the exact names available on a given template.',
+							"The field's internal_name, unprefixed (e.g. 'title'). Custom attribute internal_name values " +
+							"already include the 'c_' prefix - see Structure -> Get Template Meta for the exact names " +
+							'available on a given template.',
 					},
 					{
 						displayName: 'Value',

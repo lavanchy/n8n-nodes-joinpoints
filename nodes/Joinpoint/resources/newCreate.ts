@@ -387,7 +387,7 @@ export async function executeNewCreate(
 
 		if (type === 'company') {
 			qs.website = this.getNodeParameter('website', i, '') as string;
-			qs.websiteCrowling = this.getNodeParameter('websiteCrawling', i, false) as boolean;
+			qs.websiteCrawling = this.getNodeParameter('websiteCrawling', i, false) as boolean;
 			const department = this.getNodeParameter('department', i, '') as string;
 			if (department) qs.department = department;
 		}
