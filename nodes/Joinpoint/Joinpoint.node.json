@@ -1,17 +1,17 @@
 {
-	"node": "n8n-nodes-joinpoint",
+	"node": "n8n-nodes-joinpoints",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Development", "Developer Tools"],
+	"categories": ["Development", "Sales"],
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": "https://github.com/lavanchy/n8n-joinpoin-nodes#credentials"
+				"url": "https://github.com/lavanchy/n8n-nodes-joinpoints#credentials"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://github.com/lavanchy/n8n-joinpoin-nodes#readme"
+				"url": "https://github.com/lavanchy/n8n-nodes-joinpoints#readme"
 			}
 		]
 	}

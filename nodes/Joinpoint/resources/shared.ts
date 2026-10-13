@@ -2,24 +2,31 @@ import type { IExecuteFunctions, INodeProperties } from 'n8n-workflow';
 
 export const JOINPOINT_API_BASE_URL = 'https://app.joinpoints.io/api-v1';
 
-// INodePropertyMode has no `default` field; the lint rule below doesn't distinguish resourceLocator modes from full properties.
-const RESOURCE_LOCATOR_MODES: INodeProperties['modes'] = [
-	// eslint-disable-next-line n8n-nodes-base/node-param-default-missing -- see above
+// INodePropertyMode (the real type of a `modes` entry) has no `default` field,
+// but the n8n-nodes-base lint rule that requires one doesn't distinguish a
+// resourceLocator mode from a full property. Typed and assigned via this
+// widened type (rather than INodeProperties['modes'] directly) so the extra
+// `default` satisfies the lint rule without tripping TypeScript's excess
+// property check.
+type ResourceLocatorMode = NonNullable<INodeProperties['modes']>[number] & { default?: string };
+
+const RESOURCE_LOCATOR_MODES: ResourceLocatorMode[] = [
 	{
 		displayName: 'From List',
 		name: 'list',
 		type: 'list',
+		default: '',
 		typeOptions: {
 			searchListMethod: 'searchJoinpoints',
 			searchable: true,
 			searchFilterRequired: true,
 		},
 	},
-	// eslint-disable-next-line n8n-nodes-base/node-param-default-missing -- see above
 	{
 		displayName: 'ID',
 		name: 'id',
 		type: 'string',
+		default: '',
 		placeholder: 'e.g. 12345',
 	},
 ];

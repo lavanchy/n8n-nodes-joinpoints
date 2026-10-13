@@ -27,7 +27,6 @@ export class JoinpointApi implements ICredentialType {
 			displayName: 'Access Key',
 			name: 'accessKey',
 			type: 'string',
-			typeOptions: { password: true },
 			default: '',
 		},
 		{

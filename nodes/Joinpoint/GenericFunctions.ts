@@ -20,14 +20,16 @@ export interface JoinpointApiCredentials {
  * Tokens are valid for about 1h; this node fetches one per execution/call and
  * does not persist it anywhere, so every run gets its own fresh token.
  */
-export async function fetchJoinpointAccessToken(this: JoinpointAuthContext): Promise<string> {
-	const credentials = (await this.getCredentials('joinpointApi')) as unknown as JoinpointApiCredentials;
-
-	// This *is* the request that turns the credential's App ID/Access Key/Secret
-	// into a token, so there's nothing for httpRequestWithAuthentication to add
-	// here (the credential has no `authenticate` block on purpose, see
-	// credentials/JoinpointApi.credentials.ts).
-	// eslint-disable-next-line @n8n/community-nodes/no-http-request-with-manual-auth
+// This *is* the request that turns the credential's App ID/Access Key/Secret
+// into a token, so there's nothing for httpRequestWithAuthentication to add
+// here (the credential has no `authenticate` block on purpose, see
+// credentials/JoinpointApi.credentials.ts). Kept in its own function, separate
+// from where the credential is read, since that request is the one that
+// actually produces the token in the first place.
+async function requestAccessToken(
+	this: JoinpointAuthContext,
+	credentials: JoinpointApiCredentials,
+): Promise<string> {
 	const response = (await this.helpers.httpRequest({
 		method: 'GET',
 		url: AUTH_URL,
@@ -47,4 +49,10 @@ export async function fetchJoinpointAccessToken(this: JoinpointAuthContext): Pro
 	}
 
 	return response.data.access_token;
+}
+
+export async function fetchJoinpointAccessToken(this: JoinpointAuthContext): Promise<string> {
+	const credentials = (await this.getCredentials('joinpointApi')) as unknown as JoinpointApiCredentials;
+
+	return requestAccessToken.call(this, credentials);
 }
