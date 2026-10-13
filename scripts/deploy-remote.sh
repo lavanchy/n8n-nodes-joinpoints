@@ -36,7 +36,7 @@ ssh "$REMOTE_HOST" "docker exec ${CONTAINER} sh -c '
   mkdir -p /home/node/.n8n/custom &&
   cd /home/node/.n8n/custom &&
   [ -f package.json ] || npm init -y >/dev/null &&
-  npm install /tmp/${TARBALL_NAME}
+  npm install /tmp/${TARBALL_NAME} --omit=peer
 '"
 ssh "$REMOTE_HOST" "rm -f /root/${TARBALL_NAME}"
 
