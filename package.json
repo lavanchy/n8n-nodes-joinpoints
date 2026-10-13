@@ -3,6 +3,9 @@
     "version": "1.0.0",
     "description": "n8n community node to interact with the Joinpoints API.",
     "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
     "keywords": [
         "n8n-community-node-package",
         "joinpoint",
