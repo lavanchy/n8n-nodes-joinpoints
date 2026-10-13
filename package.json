@@ -14,11 +14,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/lavanchy/n8n-joinpoin-nodes.git"
+        "url": "git+https://github.com/lavanchy/n8n-nodes-joinpoints.git"
     },
-    "homepage": "https://github.com/lavanchy/n8n-joinpoin-nodes#readme",
+    "homepage": "https://github.com/lavanchy/n8n-nodes-joinpoints#readme",
     "bugs": {
-        "url": "https://github.com/lavanchy/n8n-joinpoin-nodes/issues"
+        "url": "https://github.com/lavanchy/n8n-nodes-joinpoints/issues"
     },
     "engines": {
         "node": ">=20.15"
