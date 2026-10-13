@@ -14,7 +14,7 @@ cd "$(dirname "$0")/.."
 
 REMOTE_HOST="joinpoint-vps"
 CONTAINER="n8n-n8n-1"
-PKG_NAME="n8n-nodes-joinpoint"
+PKG_NAME="n8n-nodes-joinpoints"
 
 echo "==> Building"
 rm -f .tsbuildinfo
