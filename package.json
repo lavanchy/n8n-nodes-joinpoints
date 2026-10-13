@@ -1,7 +1,7 @@
 {
-    "name": "n8n-nodes-joinpoint",
-    "version": "0.1.0",
-    "description": "n8n community node to interact with the Joinpoint API.",
+    "name": "n8n-nodes-joinpoints",
+    "version": "0.2.0",
+    "description": "n8n community node to interact with the Joinpoints API.",
     "license": "MIT",
     "keywords": [
         "n8n-community-node-package",
@@ -14,11 +14,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/lavanchy/n8n-joinpoin-nodes.git"
+        "url": "git+https://github.com/lavanchy/n8n-nodes-joinpoints.git"
     },
-    "homepage": "https://github.com/lavanchy/n8n-joinpoin-nodes#readme",
+    "homepage": "https://github.com/lavanchy/n8n-nodes-joinpoints#readme",
     "bugs": {
-        "url": "https://github.com/lavanchy/n8n-joinpoin-nodes/issues"
+        "url": "https://github.com/lavanchy/n8n-nodes-joinpoints/issues"
     },
     "engines": {
         "node": ">=20.15"
@@ -38,6 +38,9 @@
     "n8n": {
         "n8nNodesApiVersion": 1,
         "strict": true,
+        "credentials": [
+            "dist/credentials/JoinpointApi.credentials.js"
+        ],
         "nodes": [
             "dist/nodes/Joinpoint/Joinpoint.node.js"
         ]
