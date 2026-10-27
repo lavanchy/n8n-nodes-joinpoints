@@ -35,12 +35,12 @@ describe('fetchJoinpointAccessToken', () => {
 		);
 	});
 
-	it('throws when Joinpoint does not return an access token', async () => {
+	it('throws when Joinpoints does not return an access token', async () => {
 		const httpRequest = vi.fn().mockResolvedValue({ data: {} });
 		const context = makeContext(httpRequest);
 
 		await expect(fetchJoinpointAccessToken.call(context)).rejects.toThrow(
-			'Joinpoint did not return an access token',
+			'Joinpoints did not return an access token',
 		);
 	});
 });

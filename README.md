@@ -1,6 +1,6 @@
 # n8n-nodes-joinpoints
 
-This is an n8n community node. It lets you interact with the [Joinpoint](https://app.joinpoints.io/) API in your n8n workflows.
+This is an n8n community node. It lets you interact with the [Joinpoints](https://app.joinpoints.io/) API in your n8n workflows.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
@@ -53,7 +53,7 @@ Requires n8n with community nodes API version 1 support (`n8nNodesApiVersion: 1`
 ## Usage
 
 1. Create a **Joinpoints API** credential with your App ID, Access Key, and Secret.
-2. Add the Joinpoint node, select the credential, a **Resource**, and an **Operation**.
+2. Add the Joinpoints node, select the credential, a **Resource**, and an **Operation**.
 3. Fill in the remaining resource/operation-specific parameters. For joinpoint references, either search and pick from the list or switch to **ID** mode and enter one manually.
 
 ## Resources

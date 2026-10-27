@@ -222,7 +222,7 @@ export const newCreateDescription: INodeProperties[] = [
 		name: 'websiteCrawling',
 		type: 'boolean',
 		default: false,
-		description: "Whether Joinpoint should crawl the company's website for extra information (e.g. its image)",
+		description: "Whether Joinpoints should crawl the company's website for extra information (e.g. its image)",
 		displayOptions: { show: { ...showOnlyForThisResource, operation: ['create'], type: ['company'] } },
 	},
 	{

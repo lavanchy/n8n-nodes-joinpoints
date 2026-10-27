@@ -43,7 +43,7 @@ async function requestAccessToken(
 	})) as { data?: { access_token?: string } };
 
 	if (!response.data?.access_token) {
-		throw new NodeOperationError(this.getNode(), 'Joinpoint did not return an access token', {
+		throw new NodeOperationError(this.getNode(), 'Joinpoints did not return an access token', {
 			description: 'Double-check the App ID, Access Key, and Secret in the Joinpoints API credential',
 		});
 	}
