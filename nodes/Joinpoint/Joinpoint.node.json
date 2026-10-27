@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-joinpoints",
+	"node": "n8n-nodes-joinpoints.joinpoint",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Development", "Sales"],
