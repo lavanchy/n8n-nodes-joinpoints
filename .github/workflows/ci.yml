@@ -21,7 +21,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          # Pinned instead of 'lts/*': a transitive dependency (isolated-vm, via
+          # n8n-workflow -> @n8n/expression-runtime) fails to compile its native
+          # addon against newer Node majors (e.g. 26) until it catches up with
+          # V8 API changes. Node 22 is confirmed working.
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
