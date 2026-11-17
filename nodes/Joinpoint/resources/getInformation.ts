@@ -239,14 +239,33 @@ export const getInformationDescription: INodeProperties[] = [
 		placeholder: 'Add Filter',
 		default: {},
 		typeOptions: { multipleValues: true },
-		description: "Filter by custom attributes, e.g. 'test_attribute_1' filters on '_fc_test_attribute_1'",
+		description: 'Filter by custom attributes. \'Equals\' matches the field\'s internal_name exactly, e.g. \'test_attribute_1\' filters on \'_fc_test_attribute_1\'. \'At Least\'/\'At Most\' only work on custom attributes (internal_name \'c_&lt;ID&gt;\', e.g. \'c_115\') and filter on the numeric ID, e.g. \'_fc_115_min\' - using the full \'c_115_min\' name instead of just the ID makes the request fail.',
 		displayOptions: { show: { ...showOnlyForThisResource, operation: listOperations } },
 		options: [
 			{
 				name: 'filter',
 				displayName: 'Filter',
 				values: [
-					{ displayName: 'Filter Name', name: 'filterName', type: 'string', default: '' },
+					{
+						displayName: 'Field Internal Name',
+						name: 'filterName',
+						type: 'string',
+						default: '',
+						description:
+							"The field's internal_name, e.g. 'c_115' for a custom attribute or 'title' for a default property - see Structure -> Get Template Meta for the exact names available on a given template",
+					},
+					{
+						displayName: 'Operator',
+						name: 'operator',
+						type: 'options',
+						default: 'equals',
+						description: '\'At Least\'/\'At Most\' require a custom attribute (\'c_&lt;ID&gt;\') and filter on or after/before the given value using the numeric ID (the \'c_\' prefix is stripped automatically)',
+						options: [
+							{ name: 'Equals', value: 'equals' },
+							{ name: 'At Least (Min)', value: 'min' },
+							{ name: 'At Most (Max)', value: 'max' },
+						],
+					},
 					{ displayName: 'Value', name: 'value', type: 'string', default: '' },
 				],
 			},
@@ -298,6 +317,7 @@ export async function executeGetInformation(
 		const additionalFields = this.getNodeParameter('additionalFields', i, {}) as IDataObject;
 		const customFilterRows = this.getNodeParameter('customFilters.filter', i, []) as Array<{
 			filterName: string;
+			operator?: 'equals' | 'min' | 'max';
 			value: string;
 		}>;
 
@@ -323,7 +343,14 @@ export async function executeGetInformation(
 		}
 
 		for (const row of customFilterRows) {
-			if (row.filterName) qs[`_fc_${row.filterName}`] = row.value;
+			if (!row.filterName) continue;
+			if (row.operator === 'min' || row.operator === 'max') {
+				// Min/max only work on the numeric custom attribute ID, not the full 'c_<id>' internal_name.
+				const attributeId = row.filterName.replace(/^c_/, '');
+				qs[`_fc_${attributeId}_${row.operator}`] = row.value;
+			} else {
+				qs[`_fc_${row.filterName}`] = row.value;
+			}
 		}
 
 		const response = (await this.helpers.httpRequest({

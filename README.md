@@ -42,6 +42,13 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 Fields that reference another joinpoint (e.g. the target joinpoint, a user, or a team) use a resource locator: pick one from a searchable list (backed by the Joinpoints `/search` endpoint) or enter its ID directly.
 
+### Filtering by a custom attribute (List / List Full)
+
+The **Custom Filters** field under List / List Full filters by a template's custom attributes (find their `internal_name` via **Structure → Get Template Meta**, e.g. `c_115`):
+
+- **Equals** sends the field's full `internal_name` as-is, e.g. `c_115` or `test_attribute_1` filters on `_fc_c_115` / `_fc_test_attribute_1`. This is the only operator documented in the official [Joinpoints API docs](https://app.joinpoints.io/res/swagger/joinpoints-JoinpointsAPI-1-1-swagger.json).
+- **At Least (Min)** / **At Most (Max)** are **not documented by Joinpoints** — this behavior was found by testing against the live API. They only work on custom attributes, and only with the attribute's **numeric ID**, not its `c_`-prefixed `internal_name`: for an attribute with `internal_name` `c_115`, the node sends `_fc_115_min` / `_fc_115_max` (the node strips the `c_` prefix for you — just enter `c_115` as the Field Internal Name and pick Min/Max). Sending the full `c_115_min` as the field name instead of the bare numeric ID makes the request fail with a server error, not just "no match" — this is a backend quirk, not a formatting choice.
+
 ## Authentication
 
 This node uses a **Joinpoints API** credential (App ID, Access Key, Secret). At the start of each execution, the node calls Joinpoint's OAuth-style endpoint (`GET /api/oauth/auth`, implicit grant) once to obtain an access token, then reuses that same token for every item/operation in that run. The token is **not** persisted or cached anywhere (e.g. no Data Table) — each new execution fetches its own fresh token.
