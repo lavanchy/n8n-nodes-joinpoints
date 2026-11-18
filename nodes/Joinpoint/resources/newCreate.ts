@@ -307,6 +307,13 @@ export const newCreateDescription: INodeProperties[] = [
 	},
 ];
 
+/** Encodes file upload fields as application/x-www-form-urlencoded, repeating each key per file. */
+export function encodeFileUploadBody(fields: Record<string, string[]>): string {
+	return Object.entries(fields)
+		.flatMap(([key, values]) => values.map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`))
+		.join('&');
+}
+
 export async function executeNewCreate(
 	this: IExecuteFunctions,
 	operation: string,
@@ -336,7 +343,9 @@ export async function executeNewCreate(
 		}
 
 		const fileRows = this.getNodeParameter('files.file', i, []) as Array<{ binaryPropertyName: string }>;
-		let body: IDataObject | undefined;
+		// The Joinpoints API only accepts file uploads as application/x-www-form-urlencoded
+		// (files / fileTypes / fileNames, keys repeated per file). A JSON body is rejected with HTTP 400.
+		let body: string | undefined;
 		if (fileRows.length) {
 			const files: string[] = [];
 			const fileTypes: string[] = [];
@@ -348,7 +357,7 @@ export async function executeNewCreate(
 				fileTypes.push(binaryData.mimeType);
 				fileNames.push(binaryData.fileName ?? row.binaryPropertyName);
 			}
-			body = { files, fileTypes, fileNames };
+			body = encodeFileUploadBody({ files, fileTypes, fileNames });
 		}
 
 		return (await this.helpers.httpRequest({
@@ -356,7 +365,9 @@ export async function executeNewCreate(
 			baseURL: JOINPOINT_API_BASE_URL,
 			url: '/post',
 			qs,
-			body,
+			...(body !== undefined
+				? { body, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+				: {}),
 			arrayFormat: 'repeat',
 			json: true,
 		})) as IDataObject;
