@@ -4,6 +4,7 @@ import {
 	NodeOperationError,
 	type IDataObject,
 	type IExecuteFunctions,
+	type IHttpRequestOptions,
 	type ILoadOptionsFunctions,
 	type INodeExecutionData,
 	type INodeListSearchResult,
@@ -30,6 +31,30 @@ import { executeStructure, structureDescription } from './resources/structure';
  * version "1.1"
  * title "Joinpoints File API 1.0" description ""
  */
+/**
+ * Returns a view of the execute context whose httpRequest applies the given timeout
+ * (unless a request sets its own). All other members are delegated to the original context.
+ */
+export function withRequestTimeout(context: IExecuteFunctions, timeout: number): IExecuteFunctions {
+	const helpers = new Proxy(context.helpers, {
+		get(target, prop, receiver) {
+			if (prop === 'httpRequest') {
+				return async (options: IHttpRequestOptions) =>
+					await target.httpRequest({ ...options, timeout: options.timeout ?? timeout });
+			}
+			const value = Reflect.get(target, prop, receiver) as unknown;
+			return typeof value === 'function' ? (value as (...args: unknown[]) => unknown).bind(target) : value;
+		},
+	});
+	return new Proxy(context, {
+		get(target, prop) {
+			if (prop === 'helpers') return helpers;
+			const value = Reflect.get(target, prop, target) as unknown;
+			return typeof value === 'function' ? (value as (...args: unknown[]) => unknown).bind(target) : value;
+		},
+	});
+}
+
 export class Joinpoint implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Joinpoints',
@@ -71,6 +96,25 @@ export class Joinpoint implements INodeType {
 			...getStatisticDescription,
 			...commercialsDescription,
 			...structureDescription,
+			{
+				displayName: 'Request Options',
+				name: 'requestOptions',
+				type: 'collection',
+				placeholder: 'Add Option',
+				default: {},
+				options: [
+					{
+						displayName: 'Timeout (Ms)',
+						name: 'timeout',
+						type: 'number',
+						typeOptions: { minValue: 0 },
+						default: 0,
+						description:
+							'Abort the Joinpoints request after this many milliseconds (0 = no limit). Useful because some calls, ' +
+							"e.g. creating a contact whose email contains '+', can hang although Joinpoints still creates it.",
+					},
+				],
+			},
 		],
 	};
 
@@ -113,25 +157,28 @@ export class Joinpoint implements INodeType {
 				const resource = this.getNodeParameter('resource', i) as string;
 				const operation = this.getNodeParameter('operation', i) as string;
 
+				const timeout = this.getNodeParameter('requestOptions.timeout', i, 0) as number;
+				const context = timeout > 0 ? withRequestTimeout(this, timeout) : this;
+
 				let responseData: IDataObject | IDataObject[];
 				switch (resource) {
 					case 'newCreate':
-						responseData = await executeNewCreate.call(this, operation, i, accessToken);
+						responseData = await executeNewCreate.call(context, operation, i, accessToken);
 						break;
 					case 'change':
-						responseData = await executeChange.call(this, operation, i, accessToken);
+						responseData = await executeChange.call(context, operation, i, accessToken);
 						break;
 					case 'getInformation':
-						responseData = await executeGetInformation.call(this, operation, i, accessToken);
+						responseData = await executeGetInformation.call(context, operation, i, accessToken);
 						break;
 					case 'getStatistic':
-						responseData = await executeGetStatistic.call(this, operation, i, accessToken);
+						responseData = await executeGetStatistic.call(context, operation, i, accessToken);
 						break;
 					case 'commercials':
-						responseData = await executeCommercials.call(this, operation, i, accessToken);
+						responseData = await executeCommercials.call(context, operation, i, accessToken);
 						break;
 					case 'structure':
-						responseData = await executeStructure.call(this, operation, i, accessToken);
+						responseData = await executeStructure.call(context, operation, i, accessToken);
 						break;
 					default:
 						throw new NodeOperationError(this.getNode(), `Unknown resource "${resource}"`, { itemIndex: i });
