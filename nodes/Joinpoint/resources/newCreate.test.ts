@@ -72,3 +72,58 @@ describe('executeNewCreate post', () => {
 		expect(call.headers).toBeUndefined();
 	});
 });
+
+describe('executeNewCreate create', () => {
+	it('adds additional fields to the create request and lets them override defaults', async () => {
+		const httpRequest = vi.fn().mockResolvedValue({ status: 'ok', data: { id: 7 } });
+		const context = makePostContext({
+			params: {
+				destination: { __rl: true, mode: 'id', value: '582' },
+				typeMode: 'template',
+				type: { __rl: true, mode: 'id', value: '580' },
+				name: 'Entry',
+				'createFields.field': [
+					{ fieldName: 'base_info', value: 'Line 1\nLine 2' },
+					{ fieldName: 'c_56', value: 'ACME' },
+					{ fieldName: 'name', value: 'Override' },
+					{ fieldName: '', value: 'ignored' },
+				],
+			},
+			httpRequest,
+		});
+
+		await executeNewCreate.call(context, 'create', 0, 'token-123');
+
+		const call = httpRequest.mock.calls[0][0];
+		expect(call.url).toBe('/create');
+		expect(call.qs).toEqual({
+			access_token: 'token-123',
+			destination: '582',
+			typeMode: 'template',
+			type: '580',
+			name: 'Override',
+			base_info: 'Line 1\nLine 2',
+			c_56: 'ACME',
+		});
+	});
+
+	it('lets template contacts pass email and names as additional fields', async () => {
+		const httpRequest = vi.fn().mockResolvedValue({ status: 'ok' });
+		const context = makePostContext({
+			params: {
+				destination: { __rl: true, mode: 'id', value: '4' },
+				typeMode: 'template',
+				type: { __rl: true, mode: 'id', value: '2' },
+				'createFields.field': [
+					{ fieldName: 'email', value: 'a@example.com' },
+					{ fieldName: 'firstName', value: 'Ada' },
+				],
+			},
+			httpRequest,
+		});
+
+		await executeNewCreate.call(context, 'create', 0, 'token-123');
+
+		expect(httpRequest.mock.calls[0][0].qs).toMatchObject({ type: '2', email: 'a@example.com', firstName: 'Ada' });
+	});
+});

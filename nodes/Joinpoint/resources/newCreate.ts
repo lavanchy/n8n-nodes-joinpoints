@@ -305,6 +305,43 @@ export const newCreateDescription: INodeProperties[] = [
 		description: 'Planned amount of the new deal (optional)',
 		displayOptions: { show: { ...showOnlyForThisResource, operation: ['create'], type: ['deal'] } },
 	},
+	{
+		displayName: 'Additional Fields',
+		name: 'createFields',
+		type: 'fixedCollection',
+		placeholder: 'Add Field',
+		default: {},
+		typeOptions: { multipleValues: true },
+		description:
+			'Further properties to set on the new joinpoint in the same request, e.g. base_info, phase or custom ' +
+			"attributes (c_...). Some properties such as base_info can only be set on create, not via Update. For " +
+			'template contacts, pass email, firstName, lastName or phoneNumber here. Values set here override the fields above.',
+		displayOptions: { show: { ...showOnlyForThisResource, operation: ['create'] } },
+		options: [
+			{
+				name: 'field',
+				displayName: 'Field',
+				values: [
+					{
+						displayName: 'Field Name',
+						name: 'fieldName',
+						type: 'string',
+						default: '',
+						placeholder: 'base_info or c_myCustomField',
+						description:
+							"The field's internal_name, e.g. 'base_info', 'phase', 'customer' or a custom attribute like 'c_56' - " +
+							'see Structure -> Get Template Meta for the exact names available on a given template',
+					},
+					{
+						displayName: 'Value',
+						name: 'value',
+						type: 'string',
+						default: '',
+					},
+				],
+			},
+		],
+	},
 ];
 
 /** Encodes file upload fields as application/x-www-form-urlencoded, repeating each key per file. */
@@ -419,6 +456,14 @@ export async function executeNewCreate(
 		if (type === 'deal') {
 			const amount = this.getNodeParameter('amount', i, '') as string;
 			if (amount) qs.amount = amount;
+		}
+
+		const createFields = this.getNodeParameter('createFields.field', i, []) as Array<{
+			fieldName: string;
+			value: string;
+		}>;
+		for (const row of createFields) {
+			if (row.fieldName) qs[row.fieldName] = row.value;
 		}
 
 		return (await this.helpers.httpRequest({

@@ -18,7 +18,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 ## Operations
 
 - **New / Create**
-    - **Create** — create a new joinpoint under a destination joinpoint, optionally based on a template
+    - **Create** — create a new joinpoint under a destination joinpoint, optionally based on a template, with optional additional fields (e.g. base_info, phase, custom attributes) set in the same request
     - **Post** — add a timeline entry to a joinpoint (or create a new joinpoint within its timeline), optionally with file attachments
 - **Change**
     - **Assign Team** — assign a team to a joinpoint
