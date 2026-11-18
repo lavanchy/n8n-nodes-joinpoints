@@ -39,8 +39,16 @@ export function withRequestTimeout(context: IExecuteFunctions, timeout: number):
 	const helpers = new Proxy(context.helpers, {
 		get(target, prop, receiver) {
 			if (prop === 'httpRequest') {
-				return async (options: IHttpRequestOptions) =>
-					await target.httpRequest({ ...options, timeout: options.timeout ?? timeout });
+				return async (options: IHttpRequestOptions) => {
+					const limit = options.timeout ?? timeout;
+					// Abort signal on top of the timeout option: the signal cancels the request even
+					// when the connection hangs in a way the plain HTTP timeout does not catch.
+					return await target.httpRequest({
+						...options,
+						timeout: limit,
+						abortSignal: options.abortSignal ?? AbortSignal.timeout(limit),
+					});
+				};
 			}
 			const value = Reflect.get(target, prop, receiver) as unknown;
 			return typeof value === 'function' ? (value as (...args: unknown[]) => unknown).bind(target) : value;
@@ -150,7 +158,10 @@ export class Joinpoint implements INodeType {
 		// Fetched once per run and reused for every item below: the Joinpoints
 		// API has no way to validate/refresh a token, so each execution simply
 		// gets its own fresh one instead of sharing a cached token across runs.
-		const accessToken = await fetchJoinpointAccessToken.call(this);
+		const tokenTimeout = items.length ? (this.getNodeParameter('requestOptions.timeout', 0, 0) as number) : 0;
+		const accessToken = await fetchJoinpointAccessToken.call(
+			tokenTimeout > 0 ? withRequestTimeout(this, tokenTimeout) : this,
+		);
 
 		for (let i = 0; i < items.length; i++) {
 			try {
