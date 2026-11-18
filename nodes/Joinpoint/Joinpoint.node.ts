@@ -34,7 +34,9 @@ export class Joinpoint implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Joinpoints',
 		name: 'joinpoint',
-		icon: 'file:joinpoint.svg',
+		// joinpoint.dark.svg is a duplicate, not a recolor: the icon's only
+		// visible colors (brand red + white) already read fine on both themes.
+		icon: { light: 'file:joinpoint.svg', dark: 'file:joinpoint.dark.svg' },
 		group: ['input'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
